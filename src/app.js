@@ -8,24 +8,49 @@ var memId = localStorage["memId"];
 var url;
 var charData;
 
+
 // Show splash screen while waiting for data
 var splashWindow = new UI.Window();
 
-// Text element to inform user
-var text = new UI.Text({
-	position: new Vector2(0, 50),
-	size: new Vector2(144, 168),
-	text:'Your Characters \n are loading...',
-	font:'GOTHIC_14_BOLD',
-	color:'white',
-	textOverflow:'wrap',
-	textAlign:'center',
-	backgroundColor:'black'
+var UI = require('ui');
+// Logo for splash screen
+var logo_image = new UI.Image({
+	position: new Vector2(58, 20),
+	size: new Vector2(28, 26),
+	compositing: 'invert',
+	image: 'images/main_logo.png'
 });
+if(localStorage["username"] === ""){
+	// Text element to inform user
+	var text = new UI.Text({
+		position: new Vector2(0, 60),
+		size: new Vector2(144, 168),
+		text:'Please load your \n character info \n via the config screen \n and restart the app',
+		font:'GOTHIC_14_BOLD',
+		color:'white',
+		textOverflow:'wrap',
+		textAlign:'center',
+		backgroundColor:'black'
+	});	
+}else{
+	// Text element to inform user
+	var text = new UI.Text({
+		position: new Vector2(0, 60),
+		size: new Vector2(144, 168),
+		text:'Your Characters \n are loading...',
+		font:'GOTHIC_14_BOLD',
+		color:'white',
+		textOverflow:'wrap',
+		textAlign:'center',
+		backgroundColor:'black'
+	});
+}
 
 // Add to splashWindow and show
 splashWindow.add(text);
+splashWindow.add(logo_image);
 splashWindow.show();
+
 
 
 var hashes = [
@@ -73,7 +98,7 @@ Pebble.addEventListener("webviewclosed", function(e) {
 	}
 });
 
-if(!localStorage["username"]) {
+if(localStorage["username"] === "") {
 	return;
 }else{
 
@@ -123,7 +148,7 @@ if(!localStorage["username"]) {
 				// need to put if statement if memId is not available
 				var memId = data.Response[0].membershipId;
 				localStorage["memId"] = memId;
-				console.log(memId)
+				//console.log(memId)
 				processAllAjaxCalls();
 			},
 			function( error ) {
@@ -172,50 +197,98 @@ if(!localStorage["username"]) {
 						var recovery = data.Response.data.characters[e.itemIndex].characterBase.stats.STAT_RECOVERY.value;
 						var glimmer = data.Response.data.inventory.currencies[0].value;
 						var grimoireScore = data.Response.data.grimoireScore;
+						var charId = data.Response.data.characters[e.itemIndex].characterBase.characterId;
 
-						var charDetails = new UI.Menu({
-							sections: [{
-								title: e.item.title,
-								items: [{
-									title: "Power Level",
-									subtitle: powerLevel
-								},{
-									title: "Glimmer",
-									subtitle: glimmer + " / 25000"
-								},{
-									title: "Grimoire Score",
-									subtitle: grimoireScore
-								}]
-							},{
-								title: "Primary Stats",
-								items: [{
-									title: "Defense",
-									subtitle: defense
-								},{
-									title: "Intellect",
-									subtitle: intellect
-								},{
-									title: "Decipline",
-									subtitle: decipline
-								},{
-									title: "Strength",
-									subtitle: strength
-								}]
-							},{
-								title: "Secondary Stats",
-								items: [{
-									title: "Armor",
-									subtitle: armor + " / 10"
-								},{
-									title: "Agility",
-									subtitle: agility + " / 10"
-								},{
-									title: "Recovery",
-									subtitle: recovery + " / 10"
-								}]
-							}]
-						});
-						charDetails.show();
+						var charUrl = "http://www.bungie.net/Platform/Destiny/"+ platform +"/Account/"+ memId +"/Character/"+ charId +"/progression/";
+						console.log(charUrl);
+						produceNow();
+						function produceNow(){
+							ajax(
+								{ 
+									url: charUrl, 
+									type: 'json'
+								}, function(data3) {
+									var vanLv = data3.Response.data.progressions[15].level;
+									var vanProg = data3.Response.data.progressions[15].progressToNextLevel;
+									var vanNext = data3.Response.data.progressions[15].nextLevelAt;
+									var cruLv = data3.Response.data.progressions[16].level;
+									var cruProg = data3.Response.data.progressions[16].progressToNextLevel;
+									var cruNext = data3.Response.data.progressions[16].nextLevelAt;
+									var cripLv = data3.Response.data.progressions[11].level;
+									var cripProg = data3.Response.data.progressions[11].progressToNextLevel;
+									var cripNext = data3.Response.data.progressions[11].nextLevelAt;
+
+
+									//console.log(vanExp);
+									var charDetails = new UI.Menu({
+										sections: [{
+											title: e.item.title,
+											items: [{
+												title: "Power Level",
+												subtitle: powerLevel
+											},{
+												title: "Glimmer",
+												subtitle: glimmer + " / 25000"
+											},{
+												title: "Grimoire Score",
+												subtitle: grimoireScore
+											}]
+										},{
+											title: "Progression",
+											items: [{
+												title: "Vanguard Level",
+												subtitle: vanLv
+											},{
+												title: "Vanguard Exp",
+												subtitle: vanProg + " / " + vanNext
+											},{
+												title: "Cruicible Level",
+												subtitle: cruLv
+											},{
+												title: "Cruicible Exp",
+												subtitle: cruProg + " / " + cruNext
+											},{
+												title: "Cryptarch Level",
+												subtitle: cripLv
+											},{
+												title: "Cryptarch Exp",
+												subtitle: cripProg + " / " + cripNext
+											}]
+										},{
+											title: "Primary Stats",
+											items: [{
+												title: "Defense",
+												subtitle: defense
+											},{
+												title: "Intellect",
+												subtitle: intellect
+											},{
+												title: "Decipline",
+												subtitle: decipline
+											},{
+												title: "Strength",
+												subtitle: strength
+											}]
+										},{
+											title: "Secondary Stats",
+											items: [{
+												title: "Armor",
+												subtitle: armor + " / 10"
+											},{
+												title: "Agility",
+												subtitle: agility + " / 10"
+											},{
+												title: "Recovery",
+												subtitle: recovery + " / 10"
+											}]
+										}]
+									});
+									charDetails.show();
+								});
+						}
+						
+						
+						
 						// Get that forecast
 						//			var forecast = data.Response.data.characters[e.itemIndex];
 						//
