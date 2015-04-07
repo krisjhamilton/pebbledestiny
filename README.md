@@ -16,3 +16,6 @@ Roadmap:
 
 As it took me a while to source the relevant Pebble.JS pieces to build this app, I am making it open-source. Please feel free to help update, optimise and improve.
 
+The Configuration page can be found at http://krisjhamilton.github.io/destiny.html
+
+
