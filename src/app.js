@@ -286,25 +286,7 @@ if(localStorage["username"] === "") {
 									charDetails.show();
 								});
 						}
-						
-						
-						
-						// Get that forecast
-						//			var forecast = data.Response.data.characters[e.itemIndex];
-						//
-						//			// Assemble body string
-						//			var contentL1 = data.Response.data.characters[e.itemIndex].characterBase.powerLevel;
-						//			var contentL2 = data.Response.data.characters[e.itemIndex].characterBase.stats.STAT_DEFENSE.value;
-						//			var contentL3 = data.Response.data.characters[e.itemIndex].characterBase.stats.STAT_INTELLECT.value;
-						//			var contentL4 = data.Response.data.characters[e.itemIndex].characterBase.stats.STAT_STRENGTH.value;
-						//			// Create the Card for detailed view
-						//			var detailCard = new UI.Card({
-						//				title:e.item.title,
-						//				subtitle:e.item.subtitle,
-						//				body: "Power Level: " + contentL1 +"\nDefense: "+ contentL2 +"\nIntellect: "+ contentL3 +"\nStrength: "+ contentL4
 					});
-					//			detailCard.show();
-					// Show the Menu, hide the splash
 					resultsMenu.show();
 					splashWindow.hide();
 				}
