@@ -7,12 +7,13 @@ var platform = localStorage["platform"];
 var memId = localStorage["memId"];
 var url;
 var charData;
-
+var text;
+var apiKey = "461d389ee0d547c39357527c6afea244";
 
 // Show splash screen while waiting for data
 var splashWindow = new UI.Window();
 
-var UI = require('ui');
+//var UI = require('ui');
 // Logo for splash screen
 var logo_image = new UI.Image({
 	position: new Vector2(58, 20),
@@ -22,7 +23,7 @@ var logo_image = new UI.Image({
 });
 if(localStorage["username"] === ""){
 	// Text element to inform user
-	var text = new UI.Text({
+	text = new UI.Text({
 		position: new Vector2(0, 60),
 		size: new Vector2(144, 168),
 		text:'Please load your \n character info \n via the config screen \n and restart the app',
@@ -31,10 +32,10 @@ if(localStorage["username"] === ""){
 		textOverflow:'wrap',
 		textAlign:'center',
 		backgroundColor:'black'
-	});	
+	});
 }else{
 	// Text element to inform user
-	var text = new UI.Text({
+	text = new UI.Text({
 		position: new Vector2(0, 60),
 		size: new Vector2(144, 168),
 		text:'Your Characters \n are loading...',
@@ -55,23 +56,23 @@ splashWindow.show();
 
 var hashes = [
 	{"hash": "3159615086", "name": "Glimmer"},
-	{"hash": "1415355184", "name": "Crucible marks"}, 
-	{"hash": "1415355173", "name": "Vanguard marks"}, 
-	{"hash": "898834093", "name": "Exo"}, 
-	{"hash": "3887404748", "name": "Human"}, 
-	{"hash": "2803282938", "name": "Awoken"}, 
-	{"hash": "3111576190", "name": "Male"}, 
-	{"hash": "2204441813", "name": "Female"}, 
-	{"hash": "671679327", "name": "Hunter"}, 
-	{"hash": "3655393761", "name": "Titan"}, 
-	{"hash": "2271682572", "name": "Warlock"}, 
-	{"hash": "3871980777", "name": "New Monarchy"}, 
-	{"hash": "529303302", "name": "Cryptarch"}, 
-	{"hash": "2161005788", "name": "Iron Banner"}, 
-	{"hash": "452808717", "name": "Queen"}, 
-	{"hash": "3233510749", "name": "Vanguard"}, 
-	{"hash": "1357277120", "name": "Crucible"}, 
-	{"hash": "2778795080", "name": "Dead Orbit"}, 
+	{"hash": "1415355184", "name": "Crucible marks"},
+	{"hash": "1415355173", "name": "Vanguard marks"},
+	{"hash": "898834093", "name": "Exo"},
+	{"hash": "3887404748", "name": "Human"},
+	{"hash": "2803282938", "name": "Awoken"},
+	{"hash": "3111576190", "name": "Male"},
+	{"hash": "2204441813", "name": "Female"},
+	{"hash": "671679327", "name": "Hunter"},
+	{"hash": "3655393761", "name": "Titan"},
+	{"hash": "2271682572", "name": "Warlock"},
+	{"hash": "3871980777", "name": "New Monarchy"},
+	{"hash": "529303302", "name": "Cryptarch"},
+	{"hash": "2161005788", "name": "Iron Banner"},
+	{"hash": "452808717", "name": "Queen"},
+	{"hash": "3233510749", "name": "Vanguard"},
+	{"hash": "1357277120", "name": "Crucible"},
+	{"hash": "2778795080", "name": "Dead Orbit"},
 	{"hash": "1424722124", "name": "Future War Cult"}
 ];
 
@@ -131,7 +132,7 @@ if(localStorage["username"] === "") {
 
 			items.push({
 				title: "[ " + powerLevel + " ]" + " " + classResult,//+ platform + username,
-				subtitle: genderResult + " " + raceResult 
+				subtitle: genderResult + " " + raceResult
 			});
 		}
 		return items;
@@ -139,32 +140,37 @@ if(localStorage["username"] === "") {
 
 	if(username){
 		ajax(
-			{ 
+			{
 				url: "http://www.bungie.net/Platform/Destiny/SearchDestinyPlayer/"+platform+"/"+username+"/",
-				type: 'json'
+				type: 'json',
+				headers: {
+
+					"X-API-Key": apiKey
+				}
 			},
 			function(data) {
-				console.log(localStorage["username"]);
+				//console.log(localStorage["username"]);
 				// need to put if statement if memId is not available
 				var memId = data.Response[0].membershipId;
 				localStorage["memId"] = memId;
 				//console.log(memId)
 				processAllAjaxCalls();
-			},
-			function( error ) {
-				console.log( 'The ajax request B failed: ' + error );
 			});
 	}
 
 	function processAllAjaxCalls(data) {
 		var username = localStorage["username"];
 		var platform = localStorage["platform"];
-		var memId = localStorage["memId"]; 
+		var memId = localStorage["memId"];
 		url = "http://www.bungie.net/Platform/Destiny/"+platform+"/Account/"+memId+"/";
 		ajax(
-			{ 
-				url: url, 
-				type: 'json'
+			{
+				url: url,
+				type: 'json',
+				headers: {
+
+					"X-API-Key": apiKey
+				}
 			}, function(data) {
 				charData=data;
 				//processAllAjaxCalls(charData);
@@ -187,8 +193,8 @@ if(localStorage["username"] === "") {
 					resultsMenu.on('select', function(e) {
 						//var menuItems2 = parseFeed2(data);
 						// Construct Menu to show to user
-						var powerLevel = data.Response.data.characters[e.itemIndex].characterBase.powerLevel;
-						var defense = data.Response.data.characters[e.itemIndex].characterBase.stats.STAT_DEFENSE.value;
+						var lightLevel = data.Response.data.characters[e.itemIndex].characterBase.powerLevel;
+						var baseLevel = data.Response.data.characters[e.itemIndex].baseCharacterLevel;
 						var decipline = data.Response.data.characters[e.itemIndex].characterBase.stats.STAT_DISCIPLINE.value;
 						var intellect = data.Response.data.characters[e.itemIndex].characterBase.stats.STAT_INTELLECT.value;
 						var strength = data.Response.data.characters[e.itemIndex].characterBase.stats.STAT_STRENGTH.value;
@@ -198,25 +204,49 @@ if(localStorage["username"] === "") {
 						var glimmer = data.Response.data.inventory.currencies[0].value;
 						var grimoireScore = data.Response.data.grimoireScore;
 						var charId = data.Response.data.characters[e.itemIndex].characterBase.characterId;
-
+						var legMarks = data.Response.data.inventory.currencies[1].value;
 						var charUrl = "http://www.bungie.net/Platform/Destiny/"+ platform +"/Account/"+ memId +"/Character/"+ charId +"/progression/";
 						console.log(charUrl);
 						produceNow();
 						function produceNow(){
 							ajax(
-								{ 
-									url: charUrl, 
-									type: 'json'
+								{
+									url: charUrl,
+									type: 'json',
+									headers: {
+										"X-API-Key": apiKey
+									}
 								}, function(data3) {
-									var vanLv = data3.Response.data.progressions[15].level;
-									var vanProg = data3.Response.data.progressions[15].progressToNextLevel;
-									var vanNext = data3.Response.data.progressions[15].nextLevelAt;
-									var cruLv = data3.Response.data.progressions[16].level;
-									var cruProg = data3.Response.data.progressions[16].progressToNextLevel;
-									var cruNext = data3.Response.data.progressions[16].nextLevelAt;
-									var cripLv = data3.Response.data.progressions[11].level;
-									var cripProg = data3.Response.data.progressions[11].progressToNextLevel;
-									var cripNext = data3.Response.data.progressions[11].nextLevelAt;
+									var cryptLv = data3.Response.data.progressions[12].level;
+									var cryptProg = data3.Response.data.progressions[12].progressToNextLevel;
+									var cryptNext = data3.Response.data.progressions[12].nextLevelAt;
+									var vanLv = data3.Response.data.progressions[16].level;
+									var vanProg = data3.Response.data.progressions[16].progressToNextLevel;
+									var vanNext = data3.Response.data.progressions[16].nextLevelAt;
+									var cruLv = data3.Response.data.progressions[17].level;
+									var cruProg = data3.Response.data.progressions[17].progressToNextLevel;
+									var cruNext = data3.Response.data.progressions[17].nextLevelAt;
+									var deadLv = data3.Response.data.progressions[18].level;
+									var deadProg = data3.Response.data.progressions[18].progressToNextLevel;
+									var deadNext = data3.Response.data.progressions[18].nextLevelAt;
+									var futLv = data3.Response.data.progressions[19].level;
+									var futProg = data3.Response.data.progressions[19].progressToNextLevel;
+									var futNext = data3.Response.data.progressions[19].nextLevelAt;
+									var newMLv = data3.Response.data.progressions[20].level;
+									var newMProg = data3.Response.data.progressions[20].progressToNextLevel;
+									var newMNext = data3.Response.data.progressions[20].nextLevelAt;
+									var houseLv = data3.Response.data.progressions[24].level;
+									var houseProg = data3.Response.data.progressions[24].progressToNextLevel;
+									var houseNext = data3.Response.data.progressions[24].nextLevelAt;
+									var queenLv = data3.Response.data.progressions[25].level;
+									var queenProg = data3.Response.data.progressions[25].progressToNextLevel;
+									var queenNext = data3.Response.data.progressions[25].nextLevelAt;
+									var gunLv = data3.Response.data.progressions[26].level;
+									var gunProg = data3.Response.data.progressions[26].progressToNextLevel;
+									var gunNext = data3.Response.data.progressions[26].nextLevelAt;
+									var crotaLv = data3.Response.data.progressions[13].level;
+									var crotaProg = data3.Response.data.progressions[13].progressToNextLevel;
+									var crotaNext = data3.Response.data.progressions[13].nextLevelAt;
 
 
 									//console.log(vanExp);
@@ -224,17 +254,23 @@ if(localStorage["username"] === "") {
 										sections: [{
 											title: e.item.title,
 											items: [{
-												title: "Power Level",
-												subtitle: powerLevel
+												title: "Base Level",
+												subtitle: baseLevel
+											},{
+												title: "Light Level",
+												subtitle: lightLevel
 											},{
 												title: "Glimmer",
 												subtitle: glimmer + " / 25000"
 											},{
 												title: "Grimoire Score",
 												subtitle: grimoireScore
+											},{
+												title: "Legendary Marks",
+												subtitle: legMarks
 											}]
 										},{
-											title: "Progression",
+											title: "Reputation",
 											items: [{
 												title: "Vanguard Level",
 												subtitle: vanLv
@@ -249,17 +285,56 @@ if(localStorage["username"] === "") {
 												subtitle: cruProg + " / " + cruNext
 											},{
 												title: "Cryptarch Level",
-												subtitle: cripLv
+												subtitle: cryptLv
 											},{
 												title: "Cryptarch Exp",
-												subtitle: cripProg + " / " + cripNext
+												subtitle: cryptProg + " / " + cryptNext
+											},{
+												title: "Gunsmith Level",
+												subtitle: gunLv
+											},{
+												title: "Gunsmith Exp",
+												subtitle: gunProg + " / " + gunNext
+											},{
+												title: "House of Judgement Level",
+												subtitle: houseLv
+											},{
+												title: "House of Judgement Exp",
+												subtitle: houseProg + " / " + houseNext
+											},{
+												title: "Queens Wrath Level",
+												subtitle: queenLv
+											},{
+												title: "Queens Wrath Exp",
+												subtitle: queenProg + " / " + queenNext
+											},{
+												title: "Crotas Bane Level",
+												subtitle: crotaLv
+											},{
+												title: "Crotas Bane Exp",
+												subtitle: crotaProg + " / " + crotaNext
+											},{
+												title: "Future War Cult Level",
+												subtitle: futLv
+											},{
+												title: "Future War Cult Exp",
+												subtitle: futProg + " / " + futNext
+											},{
+												title: "Dead Orbit Level",
+												subtitle: deadLv
+											},{
+												title: "Dead Orbit Exp",
+												subtitle: deadProg + " / " + deadNext
+											},{
+												title: "New Monarchy Level",
+												subtitle: newMLv
+											},{
+												title: "New Monarchy Exp",
+												subtitle: newMProg + " / " + newMNext
 											}]
 										},{
 											title: "Primary Stats",
 											items: [{
-												title: "Defense",
-												subtitle: defense
-											},{
 												title: "Intellect",
 												subtitle: intellect
 											},{
@@ -294,7 +369,3 @@ if(localStorage["username"] === "") {
 		);
 	}
 }
-
-
-
-

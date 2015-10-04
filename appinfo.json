@@ -40,8 +40,9 @@
     "shortName": "Destiny Tracker",
     "uuid": "0fea5701-5ffe-47fc-9c66-219f22a9cd79",
     "versionCode": 1,
-    "versionLabel": "1.0",
+    "versionLabel": "2.0",
     "watchapp": {
+        "hiddenApp": false,
         "watchface": false
     }
 }
